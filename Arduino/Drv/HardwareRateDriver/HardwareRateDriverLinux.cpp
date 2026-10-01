@@ -1,7 +1,7 @@
 #include <Fw/Types/BasicTypes.hpp>
 #include <Os/Task.hpp>
 #include <Fw/Types/EightyCharString.hpp>
-#include <ATmega/Drv/HardwareRateDriver/HardwareRateDriver.hpp>
+#include <Arduino/Drv/HardwareRateDriver/HardwareRateDriver.hpp>
 #include <sys/time.h>
 
 namespace Arduino {
