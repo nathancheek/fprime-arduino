@@ -1,0 +1,24 @@
+// Minimal <algorithm> for avr-gcc, which ships without a C++ standard library
+#ifndef AVR_STD_ALGORITHM
+#define AVR_STD_ALGORITHM
+
+namespace std {
+template <typename T>
+constexpr const T& min(const T& a, const T& b) {
+    return (b < a) ? b : a;
+}
+template <typename T>
+constexpr const T& max(const T& a, const T& b) {
+    return (a < b) ? b : a;
+}
+template <typename InputIt, typename T>
+InputIt find(InputIt first, InputIt last, const T& value) {
+    for (; first != last; ++first) {
+        if (*first == value) {
+            return first;
+        }
+    }
+    return last;
+}
+}  // namespace std
+#endif
