@@ -1,0 +1,7 @@
+// Minimal <cerrno> for avr-gcc, which ships without a C++ standard library
+#ifndef AVR_STD_CERRNO
+#define AVR_STD_CERRNO
+extern "C" {
+#include <errno.h>
+}  // extern "C"
+#endif

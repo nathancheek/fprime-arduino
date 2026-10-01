@@ -21,5 +21,12 @@ set(ARDUINO_FQBN "MegaCore:avr:128")
 add_compile_options(-DATMEGA)
 # Run the base arduino setup which should detect settings!
 include("${CMAKE_CURRENT_LIST_DIR}/support/arduino-support.cmake")
+# avr-gcc ships without a C++ standard library. Use the minimal standard headers in platform/basic/Platform, plus the
+# AVR-only ones in platform/avr-std, everywhere (including F´ framework config modules). Not SYSTEM: avr-gcc implicitly
+# wraps system headers in extern "C", which breaks the templates in these headers.
+include_directories(
+    "${CMAKE_CURRENT_LIST_DIR}/../platform/avr-std"
+    "${CMAKE_CURRENT_LIST_DIR}/../platform/basic/Platform"
+)
 # Use the ranlib wrapper which adds the appropriate --plugin option for the compiler
 SET(CMAKE_RANLIB "${CMAKE_CXX_COMPILER_RANLIB}")
