@@ -14,11 +14,10 @@ set(CMAKE_CROSSCOMPILING 1)
 set(FPRIME_PLATFORM "ArduinoFw")
 set(FPRIME_USE_BAREMETAL_SCHEDULER ON)
 set(ARDUINO_BUILD_PROPERTIES "build.extra_flags=-flto -mrelax -mcall-prologues")
-set(ARDUINO_BOARD_OPTIONS "clock=7_3728MHz_external")
 set(ARDUINO_LINKER_FLAGS "-Wl,--section-start,.data=0x801100,--defsym=__heap_end=0x80ffff")
 
-set(ARDUINO_FQBN "MegaCore:avr:128")
-add_compile_options(-DATMEGA)
+set(ARDUINO_FQBN "MegaCore:avr:128:clock=7_3728MHz_external")
+add_compile_options(-DATMEGA -DUSE_BASIC_TIMER)
 # Run the base arduino setup which should detect settings!
 include("${CMAKE_CURRENT_LIST_DIR}/support/arduino-support.cmake")
 # avr-gcc ships without a C++ standard library. Use the minimal standard headers in platform/basic/Platform, plus the
