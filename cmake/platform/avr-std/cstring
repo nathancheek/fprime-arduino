@@ -1,0 +1,17 @@
+// Minimal <cstring> for avr-gcc, which ships without a C++ standard library
+#ifndef AVR_STD_CSTRING
+#define AVR_STD_CSTRING
+#include <string.h>
+namespace std {
+using ::memchr;
+using ::memcmp;
+using ::memcpy;
+using ::memmove;
+using ::memset;
+using ::strcmp;
+using ::strcpy;
+using ::strlen;
+using ::strncmp;
+using ::strncpy;
+}  // namespace std
+#endif
