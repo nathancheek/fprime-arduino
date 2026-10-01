@@ -1,0 +1,48 @@
+// Minimal <type_traits> for avr-gcc, which ships without a C++ standard library
+#ifndef AVR_STD_TYPE_TRAITS
+#define AVR_STD_TYPE_TRAITS
+
+namespace std {
+template <typename T, T v>
+struct integral_constant {
+    static constexpr T value = v;
+    typedef T value_type;
+    typedef integral_constant type;
+    constexpr operator value_type() const noexcept { return value; }
+};
+typedef integral_constant<bool, true> true_type;
+typedef integral_constant<bool, false> false_type;
+
+template <typename Base, typename Derived>
+struct is_base_of : integral_constant<bool, __is_base_of(Base, Derived)> {};
+
+template <typename T, typename U>
+struct is_same : false_type {};
+template <typename T>
+struct is_same<T, T> : true_type {};
+
+template <bool B, typename T = void>
+struct enable_if {};
+template <typename T>
+struct enable_if<true, T> {
+    typedef T type;
+};
+
+template <bool B, typename T, typename F>
+struct conditional {
+    typedef T type;
+};
+template <typename T, typename F>
+struct conditional<false, T, F> {
+    typedef F type;
+};
+
+template <typename T> struct make_unsigned { typedef T type; };
+template <> struct make_unsigned<char> { typedef unsigned char type; };
+template <> struct make_unsigned<signed char> { typedef unsigned char type; };
+template <> struct make_unsigned<short> { typedef unsigned short type; };
+template <> struct make_unsigned<int> { typedef unsigned int type; };
+template <> struct make_unsigned<long> { typedef unsigned long type; };
+template <> struct make_unsigned<long long> { typedef unsigned long long type; };
+}  // namespace std
+#endif

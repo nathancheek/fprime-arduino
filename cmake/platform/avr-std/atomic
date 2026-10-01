@@ -1,0 +1,6 @@
+// <atomic> for avr-gcc: include guard around fprime-baremetal's non-atomic std::atomic stub (which has none). Not safe
+// for data shared with interrupt handlers.
+#ifndef AVR_STD_ATOMIC
+#define AVR_STD_ATOMIC
+#include <fprime-baremetal/Os/StdAtomic/atomic>
+#endif
