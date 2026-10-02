@@ -5,8 +5,9 @@
 
 namespace Arduino {
 
-// Ticks counted by the Timer1 interrupt and not yet dispatched by cycle()
-static volatile U8 s_pendingTicks = 0;
+// Ticks counted by the Timer1 interrupt and not yet dispatched by cycle(). In .noinit and not static so a
+// reset handler can read the count from before a reset (a high count means the main loop had stalled).
+volatile U8 s_pendingTicks __attribute__((section(".noinit")));
 
 void HardwareRateDriver::start() {
     s_pendingTicks = 0;
