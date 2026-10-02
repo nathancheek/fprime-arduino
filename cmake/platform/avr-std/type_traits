@@ -37,6 +37,44 @@ struct conditional<false, T, F> {
     typedef F type;
 };
 
+template <typename T>
+T&& declval() noexcept;
+
+// Covers direct construction of object types, which is all fprime needs; references and arrays are not handled
+template <typename T, typename... Args>
+struct is_constructible {
+  private:
+    template <typename U, typename = decltype(U(declval<Args>()...))>
+    static true_type test(int);
+    template <typename U>
+    static false_type test(...);
+
+  public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+};
+
+template <typename T>
+struct is_default_constructible : integral_constant<bool, is_constructible<T>::value> {};
+
+template <typename T, typename U>
+struct is_assignable {
+  private:
+    template <typename V, typename = decltype(declval<V>() = declval<U>())>
+    static true_type test(int);
+    template <typename V>
+    static false_type test(...);
+
+  public:
+    static constexpr bool value = decltype(test<T>(0))::value;
+};
+
+template <typename T>
+struct is_array : false_type {};
+template <typename T>
+struct is_array<T[]> : true_type {};
+template <typename T, decltype(sizeof(0)) N>
+struct is_array<T[N]> : true_type {};
+
 template <typename T> struct make_unsigned { typedef T type; };
 template <> struct make_unsigned<char> { typedef unsigned char type; };
 template <> struct make_unsigned<signed char> { typedef unsigned char type; };
