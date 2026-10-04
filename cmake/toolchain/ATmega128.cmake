@@ -27,5 +27,6 @@ include_directories(
     "${CMAKE_CURRENT_LIST_DIR}/../platform/avr-std"
     "${CMAKE_CURRENT_LIST_DIR}/../platform/basic/Platform"
 )
-# Use the ranlib wrapper which adds the appropriate --plugin option for the compiler
-SET(CMAKE_RANLIB "${CMAKE_CXX_COMPILER_RANLIB}")
+# Use the ranlib wrapper (avr-gcc-ranlib), which adds the --plugin option that LTO archives need. Derived from the
+# compiler path because CMAKE_CXX_COMPILER_RANLIB isn't set yet when CMake's compiler checks run this file.
+string(REGEX REPLACE "gcc$" "gcc-ranlib" CMAKE_RANLIB "${CMAKE_C_COMPILER}")
