@@ -7,6 +7,7 @@
  *  Modified again, June 2014 by Paul Stoffregen - support Teensy 3.x & even more AVR chips
  *  Modified July 2017 by Stoyko Dimitrov - added support for ATTiny85 except for the PWM functionality
  *  Modified August 2024 by Nathan Cheek - added support for ATmega128
+ *  Modified October 2026 by Nathan Cheek - exact AVR periods for clocks that aren't a whole number of MHz
  *  
  *
  *  This is free software. You can redistribute it and/or modify it under
@@ -187,7 +188,7 @@ class TimerOne
 	setPeriod(microseconds);
     }
     void setPeriod(unsigned long microseconds) __attribute__((always_inline)) {
-	const unsigned long cycles = ((F_CPU/100000 * microseconds) / 20);
+	const unsigned long cycles = halfPeriodCycles(microseconds);
 	if (cycles < TIMER1_RESOLUTION) {
 		clockSelectBits = _BV(CS10);
 		pwmPeriod = cycles;
@@ -301,6 +302,20 @@ class TimerOne
     static void isrDefaultUnused();
 
   private:
+    static constexpr unsigned long gcd(unsigned long a, unsigned long b) {
+	return (b == 0) ? a : gcd(b, a % b);
+    }
+    // CPU cycles in half a period, F_CPU * microseconds / 2,000,000 (phase and frequency correct PWM counts
+    // up to ICR1 and back down). F_CPU / 2,000,000 isn't a whole number for clocks such as 7.3728 MHz, and
+    // rounding it down made every period about 1% short there. The ratio is reduced to NUM / DEN instead,
+    // and applied as whole and remainder parts so nothing overflows 32 bits.
+    static unsigned long halfPeriodCycles(unsigned long microseconds) __attribute__((always_inline)) {
+	constexpr unsigned long GCD = gcd(F_CPU, 2000000UL);
+	constexpr unsigned long NUM = F_CPU / GCD;
+	constexpr unsigned long DEN = 2000000UL / GCD;
+	static_assert((DEN - 1) <= 0xFFFFFFFFUL / NUM, "F_CPU / 2,000,000 can't be applied in 32 bits");
+	return (microseconds / DEN) * NUM + ((microseconds % DEN) * NUM) / DEN;
+    }
     // properties
     static unsigned short pwmPeriod;
     static unsigned char clockSelectBits;
