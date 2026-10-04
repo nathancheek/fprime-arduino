@@ -1,11 +1,31 @@
 // ======================================================================
 // \title Arduino/Os/RawTime.cpp
-// \brief stub implementation for Os::RawTime
+// \brief Arduino implementation for Os::RawTime, based on micros()
 // ======================================================================
 #include "Arduino/Os/RawTime.hpp"
 #include "Arduino/config/FprimeArduino.hpp"
 namespace Os {
 namespace Arduino {
+
+namespace {
+constexpr U32 MICROSECONDS_PER_SECOND = 1000000;
+
+// Seconds and microseconds since boot, both counted from micros(). Seconds can't come from millis(): the
+// two are read at different instants, and micros() wraps every 2^32 us (about 71.6 minutes), which isn't
+// a whole number of seconds, so after a wrap micros() % 1000000 no longer lines up with millis() / 1000.
+//
+// Each now() adds micros() - (micros() at the previous call). U32 subtraction is modulo 2^32, so this is
+// right even if micros() wrapped in between.
+//
+// Trade-off: now() must be called at least once every 71.6 minutes. Each wrap missed is silently lost,
+// putting raw time 71.6 minutes behind. F Prime deployments usually call it far more often (every rate
+// group cycle, for example).
+//
+// Shared and unguarded: call now() from one thread, not from interrupt handlers.
+U32 s_lastMicros = 0;
+U32 s_seconds = 0;
+U32 s_subsecondMicros = 0;
+}  // namespace
 
 //! \brief check if a is newer than b
 bool isNewer(const ArduinoRawTimeHandle& a, const ArduinoRawTimeHandle& b) {
@@ -18,15 +38,25 @@ RawTimeHandle* ArduinoRawTime::getHandle() {
 }
 
 RawTime::Status ArduinoRawTime::now() {
-    U32 milliseconds_now = millis();
-    U32 microseconds_now = micros() % 1000000;
-    U32 milliseconds_no_seconds = milliseconds_now % 1000;
-    // Microsecond portion and millisecond portion don't agree, assume roll-over and ask for milliseconds again
-    if (milliseconds_no_seconds != (microseconds_now/1000)) {
-        milliseconds_now = millis();
+    const U32 microsNow = ::micros();
+    const U32 elapsed = microsNow - s_lastMicros;  // modulo 2^32, see above
+    s_lastMicros = microsNow;
+
+    if (elapsed < MICROSECONDS_PER_SECOND) {
+        // Usual case: no division needed
+        s_subsecondMicros += elapsed;
+    } else {
+        s_seconds += elapsed / MICROSECONDS_PER_SECOND;
+        s_subsecondMicros += elapsed % MICROSECONDS_PER_SECOND;
     }
-    this->m_handle.m_micros = microseconds_now % 1000000;
-    this->m_handle.m_seconds = milliseconds_now / 1000;
+    // Each part added was under one second, so the sum is under two seconds: one carry is enough
+    if (s_subsecondMicros >= MICROSECONDS_PER_SECOND) {
+        s_subsecondMicros -= MICROSECONDS_PER_SECOND;
+        s_seconds++;
+    }
+
+    this->m_handle.m_seconds = s_seconds;
+    this->m_handle.m_micros = s_subsecondMicros;
     return Status::OP_OK;
 }
 
