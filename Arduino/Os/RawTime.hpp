@@ -15,9 +15,10 @@ struct ArduinoRawTimeHandle : public RawTimeHandle {
     U32 m_micros;
 };
 
-//! \brief stub implementation of Os::RawTime
+//! \brief Arduino implementation of Os::RawTime
 //!
-//! Stub implementation of `RawTimeInterface`.
+//! Raw time counts seconds and microseconds since boot, past the 71.6-minute rollover of micros(). now()
+//! must be called at least once every 71.6 minutes or the time falls behind; see RawTime.cpp.
 //!
 class ArduinoRawTime : public RawTimeInterface {
   public:
