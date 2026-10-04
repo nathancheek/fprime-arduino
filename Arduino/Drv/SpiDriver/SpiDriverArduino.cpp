@@ -39,6 +39,7 @@ void SpiDriver::open(SPIClass* spi, SpiFrequency clock, FwIndexType ss_pin, SpiM
     this->m_ss_pin = ss_pin;
     this->m_bitOrder = bitOrder;
 
+    digitalWrite(m_ss_pin, Arduino::DEF_HIGH);
     pinMode(m_ss_pin, Arduino::DEF_OUTPUT);
     spi->begin();
 }
