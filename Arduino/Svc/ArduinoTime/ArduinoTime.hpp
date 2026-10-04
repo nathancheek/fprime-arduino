@@ -39,6 +39,9 @@ class ArduinoTime : public ArduinoTimeComponentBase {
                          ) override;
 
   private:
+    U32 m_offsetSeconds;         //!< Added to the raw time to give the time, set by setTime
+    U32 m_offsetMicroseconds;    //!< Below 1,000,000
+
     // ----------------------------------------------------------------------
     // Handler implementations for commands
     // ----------------------------------------------------------------------
