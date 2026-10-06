@@ -39,10 +39,17 @@ void LifeLed ::run_handler(FwIndexType portNum, U32 context) {
     Fw::ParamValid is_valid;
     U16 count_period = this->paramGet_LED_PERIOD(is_valid);
     // Only operate when the parameter is valid
-    if (is_valid != Fw::ParamValid::INVALID) {
-        this->m_blink_count = (this->m_blink_count + 1) % count_period;
-        this->set((this->m_blink_count < (count_period / 2)) ? Fw::On::ON : Fw::On::OFF);
+    if (is_valid == Fw::ParamValid::INVALID) {
+        return;
     }
+    // A period of 0 turns the LED off
+    if (count_period == 0) {
+        this->m_blink_count = 0;
+        this->set(Fw::On::OFF);
+        return;
+    }
+    this->m_blink_count = (this->m_blink_count + 1) % count_period;
+    this->set((this->m_blink_count < (count_period / 2)) ? Fw::On::ON : Fw::On::OFF);
 }
 
 }  // namespace Arduino

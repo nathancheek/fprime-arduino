@@ -1,7 +1,7 @@
 module Arduino {
     @ LED indicating software life.
     passive component LifeLed {
-        @ LED period in units of rate group ticks
+        @ LED period in units of rate group ticks. 0 turns the LED off.
         param LED_PERIOD: U16 default 10
 
         @ Rate group port 
