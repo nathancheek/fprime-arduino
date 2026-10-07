@@ -1,4 +1,13 @@
-# ESP32 Dev Module
+# ESP32 Dev Module and ESP32-S3 Dev Module
+
+Set `<TOOLCHAIN>`, `<CHIP>` and `<BOOTLOADER_ADDR>` in the commands below for your board:
+
+| Board               | `<TOOLCHAIN>` | `<CHIP>`  | `<BOOTLOADER_ADDR>` |
+|---------------------|---------------|-----------|---------------------|
+| ESP32 Dev Module    | `esp32`       | `esp32`   | `0x1000`            |
+| ESP32-S3 Dev Module | `esp32s3`     | `esp32s3` | `0x0`               |
+
+On boards with two USB ports (e.g. ESP32-S3 dev kits), connect the one labeled `UART` (or `COM`), not `USB`.
 
 Hold down the `BOOT` button on the ESP32. Don't let go. Then run the commands below:
 
@@ -6,16 +15,16 @@ Hold down the `BOOT` button on the ESP32. Don't let go. Then run the commands be
 chmod 0777 /dev/ttyACM0
 
 # Linux
-python3 ~/.arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool.py --chip esp32 --port /dev/ttyUSB0 --baud 921600  --before default_reset --after hard_reset write_flash -e -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x1000 build-fprime-automatic-esp32/arduino-cli-sketch/tmp8lcl76bw.ino.bootloader.bin 0x8000 build-fprime-automatic-esp32/arduino-cli-sketch/tmp8lcl76bw.ino.partitions.bin 0xe000 ~/.arduino15/packages/esp32/hardware/esp32/2.0.9/tools/partitions/boot_app0.bin 0x10000 build-artifacts/esp32/<YOUR_DEPLOYMENT>/bin/<YOUR_DEPLOYMENT>.bin
+python3 ~/.arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool.py --chip <CHIP> --port /dev/ttyUSB0 --baud 921600  --before default_reset --after hard_reset write_flash -e -z --flash_mode dio --flash_freq 80m --flash_size 4MB <BOOTLOADER_ADDR> build-fprime-automatic-<TOOLCHAIN>/arduino-cli-sketch/tmp8lcl76bw.ino.bootloader.bin 0x8000 build-fprime-automatic-<TOOLCHAIN>/arduino-cli-sketch/tmp8lcl76bw.ino.partitions.bin 0xe000 ~/.arduino15/packages/esp32/hardware/esp32/2.0.9/tools/partitions/boot_app0.bin 0x10000 build-artifacts/<TOOLCHAIN>/<YOUR_DEPLOYMENT>/bin/<YOUR_DEPLOYMENT>.elf.bin
 
 # MacOS
-python3 ~/Library/Arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool.py --chip esp32 --port /dev/tty.usbmodem12345 --baud 921600  --before default_reset --after hard_reset write_flash -e -z --flash_mode dio --flash_freq 80m --flash_size 4MB 0x1000 build-fprime-automatic-esp32/arduino-cli-sketch/tmp8lcl76bw.ino.bootloader.bin 0x8000 build-fprime-automatic-esp32/arduino-cli-sketch/tmp8lcl76bw.ino.partitions.bin 0xe000 ~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.9/tools/partitions/boot_app0.bin 0x10000 build-artifacts/esp32/<YOUR_DEPLOYMENT>/bin/<YOUR_DEPLOYMENT>.bin
+~/Library/Arduino15/packages/esp32/tools/esptool_py/4.5.1/esptool --chip <CHIP> --port /dev/tty.usbmodem12345 --baud 921600  --before default_reset --after hard_reset write_flash -e -z --flash_mode dio --flash_freq 80m --flash_size 4MB <BOOTLOADER_ADDR> build-fprime-automatic-<TOOLCHAIN>/arduino-cli-sketch/tmp8lcl76bw.ino.bootloader.bin 0x8000 build-fprime-automatic-<TOOLCHAIN>/arduino-cli-sketch/tmp8lcl76bw.ino.partitions.bin 0xe000 ~/Library/Arduino15/packages/esp32/hardware/esp32/2.0.9/tools/partitions/boot_app0.bin 0x10000 build-artifacts/<TOOLCHAIN>/<YOUR_DEPLOYMENT>/bin/<YOUR_DEPLOYMENT>.elf.bin
 ```
-> Change `<YOUR_DEPLOYMENT>` to the name of your F Prime deployment.
+> Change `<YOUR_DEPLOYMENT>` to the name of your F Prime deployment (e.g. `LedBlinker_LedBlinkerDeployment`).
 > 
 > Change `/dev/ttyACM0` (`/dev/tty.usbmodem12345` for MacOS) to the correct serial device connected to the ESP32.
 >
-> Note: Change `tmp8lcl76bw` to the actual temporary file name located in `build-fprime-automatic-esp32/arduino-cli-sketch`
+> Note: Change `tmp8lcl76bw` to the actual temporary file name located in `build-fprime-automatic-<TOOLCHAIN>/arduino-cli-sketch`
 
 Once you see that data is being written (example shown below), you can let go of the button.
 
