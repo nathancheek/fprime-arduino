@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 3.19)
 include("${CMAKE_CURRENT_LIST_DIR}/arduino-wrapper.cmake")
 set(FPRIME_ARDUINO TRUE)
 set(ARDUINO_WRAPPER_JSON_OUTPUT "${CMAKE_BINARY_DIR}/arduino-cli-compiler-settings.json")
-set(EXTRA_LIBRARY_SOURCE "${CMAKE_CURRENT_LIST_DIR}/sources/extras.cpp")
+set(EXTRA_LIBRARY_SOURCE "${CMAKE_CURRENT_LIST_DIR}/sources/extras.cpp" "${CMAKE_CURRENT_LIST_DIR}/sources/atomics.c")
 
 # Set the executable suffix if not defined
 if (NOT DEFINED FPRIME_ARDUINO_EXECUTABLE_SUFFIX)
