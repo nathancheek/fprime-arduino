@@ -1,13 +1,18 @@
-# ESP32 Dev Module and ESP32-S3 Dev Module
+# ESP32 Dev Module, ESP32-S3 Dev Module and SparkFun Thing Plus ESP32-C6
 
 Set `<TOOLCHAIN>`, `<CHIP>` and `<BOOTLOADER_ADDR>` in the commands below for your board:
 
-| Board               | `<TOOLCHAIN>` | `<CHIP>`  | `<BOOTLOADER_ADDR>` |
-|---------------------|---------------|-----------|---------------------|
-| ESP32 Dev Module    | `esp32`       | `esp32`   | `0x1000`            |
-| ESP32-S3 Dev Module | `esp32s3`     | `esp32s3` | `0x0`               |
+| Board                        | `<TOOLCHAIN>`      | `<CHIP>`  | `<BOOTLOADER_ADDR>` |
+|------------------------------|--------------------|-----------|---------------------|
+| ESP32 Dev Module             | `esp32`            | `esp32`   | `0x1000`            |
+| ESP32-S3 Dev Module          | `esp32s3`          | `esp32s3` | `0x0`               |
+| SparkFun Thing Plus ESP32-C6 | `thingplusesp32c6` | `esp32c6` | `0x0`               |
 
 On boards with two USB ports (e.g. ESP32-S3 dev kits), connect the one labeled `UART` (or `COM`), not `USB`.
+
+The ESP32-C6 needs `esp32:esp32` 3.x (tested with 3.3.12): use that version's `boot_app0.bin` in the commands below.
+The Thing Plus ESP32-C6's USB-C port is the chip's own USB serial, so it shows up as `/dev/ttyACM0` on Linux and
+`/dev/cu.usbmodem*` on macOS.
 
 Hold down the `BOOT` button on the ESP32. Don't let go. Then run the commands below:
 
