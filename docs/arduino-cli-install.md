@@ -52,6 +52,7 @@ arduino-cli config add board_manager.additional_urls https://arduino.esp8266.com
 arduino-cli config add board_manager.additional_urls https://mcudude.github.io/MegaCore/package_MCUdude_MegaCore_index.json
 arduino-cli config add board_manager.additional_urls https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json
 arduino-cli config add board_manager.additional_urls https://github.com/stm32duino/BoardManagerFiles/raw/main/package_stmicroelectronics_index.json
+arduino-cli config add board_manager.additional_urls https://raw.githubusercontent.com/qbolsee/ArduinoCore-fab-sam/master/json/package_Fab_SAM_index.json
 ```
 
 Install the new board packages. Only install the ones you have added to your board manager in the previous step.
@@ -66,6 +67,7 @@ arduino-cli core install esp8266:esp8266
 arduino-cli core install MegaCore:avr
 arduino-cli core install rp2040:rp2040
 arduino-cli core install STMicroelectronics:stm32
+arduino-cli core install Fab_SAM_Arduino:samd
 ```
 
 > [!WARNING]
