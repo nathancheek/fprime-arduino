@@ -14,6 +14,14 @@
 #warning "No implementation of DEPRECATED for given compiler. Please check for use of DEPRECATED() functions"
 #define DEPRECATED(func) func
 #endif
+// Some cores (MattairTech's and the Fab SAM core) define min, max, abs and round as function-like macros, which break
+// the C++ standard library (std::numeric_limits<T>::max(), std::abs, std::round). Use std::min and std::max instead.
+#ifdef __cplusplus
+#undef min
+#undef max
+#undef abs
+#undef round
+#endif
 
 /**
  * Arduino.h often uses #define constants to setup values like HIGH and LOW. This means that other tokens that contain
