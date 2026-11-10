@@ -241,13 +241,20 @@ function(finalize_arduino_executable)
         PUBLIC fprime_arduino_libraries $<TARGET_OBJECTS:fprime_arduino_loose_object_library>
     )
     read_json(POST_COMMANDS "${WRAPPER_OUTPUT}" post)
-    set(COMMAND_SET_ARGUMENTS)
+    # Each post step runs in its own shell, so a failing step only prints a warning. Ninja joins the link command and
+    # the POST_BUILD commands with "&&", so a bare "step || echo" there would also catch a failed link and let the
+    # build succeed with a stale executable. The step is given to the shell unchanged (VERBATIM) because its text is a
+    # shell command line, e.g. MegaCore passes a quoted objdump argument list.
     foreach(COMMAND IN LISTS POST_COMMANDS)
         string(REPLACE "<TARGET_PATH>" "$<TARGET_FILE:${FPRIME_CURRENT_MODULE}>" COMMAND_WITH_INPUT "${COMMAND}")
         string(REPLACE "<TARGET_NAME>" "$<TARGET_FILE_NAME:${FPRIME_CURRENT_MODULE}>" COMMAND_WITH_INPUT "${COMMAND_WITH_INPUT}")
         string(REPLACE "<TARGET_DIRECTORY>" "$<TARGET_FILE_DIR:${FPRIME_CURRENT_MODULE}>" COMMAND_WITH_INPUT "${COMMAND_WITH_INPUT}")
-        string(REPLACE " " ";" COMMAND_WITH_INPUT "${COMMAND_WITH_INPUT}")
-        list(APPEND COMMAND_SET_ARGUMENTS COMMAND ${COMMAND_WITH_INPUT} || "${CMAKE_COMMAND}" "-E" "echo" "[ARDUINO WRAPPER POST BUILD WARNING] Error in executing: ${COMMAND_WITH_INPUT}")
+        add_custom_command(
+            TARGET "${FPRIME_CURRENT_MODULE}" POST_BUILD
+            COMMAND sh -c "${COMMAND_WITH_INPUT} || echo \"[ARDUINO WRAPPER POST BUILD WARNING] Error in executing: $1\""
+                    fprime-arduino-post-build "${COMMAND_WITH_INPUT}"
+            VERBATIM
+        )
     endforeach()
     # fprime >= v4.3 installs to FPRIME_INSTALL_DEST and sets CMAKE_INSTALL_PREFIX to "/"
     if (DEFINED FPRIME_INSTALL_DEST)
@@ -255,9 +262,10 @@ function(finalize_arduino_executable)
     else()
         set(ARDUINO_INSTALL_DIRECTORY "${CMAKE_INSTALL_PREFIX}")
     endif()
-    list(APPEND COMMAND_SET_ARGUMENTS COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different" "$<TARGET_FILE:${FPRIME_CURRENT_MODULE}>*" "${ARDUINO_INSTALL_DIRECTORY}/${TOOLCHAIN_NAME}/${FPRIME_CURRENT_MODULE}/bin")
+    # Not VERBATIM: the shell expands the "*" to the executable and the files the post steps made from it
     add_custom_command(
-        TARGET "${FPRIME_CURRENT_MODULE}" POST_BUILD ${COMMAND_SET_ARGUMENTS}
+        TARGET "${FPRIME_CURRENT_MODULE}" POST_BUILD
+        COMMAND "${CMAKE_COMMAND}" "-E" "copy_if_different" "$<TARGET_FILE:${FPRIME_CURRENT_MODULE}>*" "${ARDUINO_INSTALL_DIRECTORY}/${TOOLCHAIN_NAME}/${FPRIME_CURRENT_MODULE}/bin"
     )
 endfunction(finalize_arduino_executable)
 
